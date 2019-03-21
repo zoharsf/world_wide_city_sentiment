@@ -93,7 +93,7 @@ def fetch_geocode(city):
 
 # initial run
 def load_cities():
-    with open('resources/Cities.json', 'r', encoding="utf8") as cities_from_json:
+    with open('resources/largeCities.json', 'r', encoding="utf8") as cities_from_json:
         city_dict = json.load(cities_from_json)
     return city_dict
 
@@ -112,7 +112,7 @@ def load_city_collection():
     cities = set()
 
     try:
-        file_object = open('resources/citiesWithGeoLocation.json', 'r', encoding="utf8")
+        file_object = open('resources/largeCitiesWithGeoLocation.json', 'r', encoding="utf8")
         cities_from_json = json.load(file_object)
         for city_from_json in cities_from_json:
             city = City(city_from_json['name'], city_from_json['location'])
@@ -127,7 +127,7 @@ def write_city_data_to_file(cities):
     for city in cities:
         city_list.append(city.__dict__)
     try:
-        file_object = open('resources/citiesWithGeoLocation.json', 'w')
+        file_object = open('resources/largeCitiesWithGeoLocation.json', 'w')
         json.dump(city_list, file_object)
 
     except FileNotFoundError:
