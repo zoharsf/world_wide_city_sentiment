@@ -69,7 +69,6 @@ def convert_list_to_data_frame(cities):
         score.append(city.score_trend)
     zippedList = list(zip(names, lon, lat, score))
     cities_data_frame = pd.DataFrame(zippedList, columns=['name', 'lon', 'lat', 'score'])
-    # print(cities_data_frame)
     return cities_data_frame
 
 
@@ -95,8 +94,6 @@ def fetch_geocode(city):
 # initial run
 def load_cities():
     with open('resources/Cities.json', 'r', encoding="utf8") as cities_from_json:
-        # with open('resources/smallCities.json', 'r', encoding="utf8") as cities_from_json:
-        # with open('resources/interestingCities.json', 'r', encoding="utf8") as cities_from_json:
         city_dict = json.load(cities_from_json)
     return city_dict
 
@@ -107,7 +104,6 @@ def create_city_collection(city_dict):
         geo_code = fetch_geocode(city['name'])
         new_city = City(city['name'], geo_code)
         cities.add(new_city)
-        # print(new_city)
     return cities
 
 
@@ -116,11 +112,8 @@ def load_city_collection():
     cities = set()
 
     try:
-        file_object = open('resources/interestingCitiesWithGeoLocation.json', 'r', encoding="utf8")
-        # file_object = open('resources/citiesWithGeoLocation.json', 'r', encoding="utf8")
-        # file_object = open('resources/smallCitiesWithGeoLocation.json', 'r', encoding="utf8")
+        file_object = open('resources/citiesWithGeoLocation.json', 'r', encoding="utf8")
         cities_from_json = json.load(file_object)
-        # print(cities_from_json)
         for city_from_json in cities_from_json:
             city = City(city_from_json['name'], city_from_json['location'])
             cities.add(city)
@@ -134,7 +127,7 @@ def write_city_data_to_file(cities):
     for city in cities:
         city_list.append(city.__dict__)
     try:
-        file_object = open('resources/interestingCitiesWithGeoLocation.json', 'w')
+        file_object = open('resources/citiesWithGeoLocation.json', 'w')
         json.dump(city_list, file_object)
 
     except FileNotFoundError:
@@ -144,7 +137,6 @@ def write_city_data_to_file(cities):
 def query_twitter_for_tweets(geo_code):
     tweets = set()
     for tweet in tweepy.Cursor(api.search, q="*", geocode=geo_code, lang="en").items(50):
-        # for tweet in tweepy.Cursor(api.search, q="*", count=100, geocode=geo_code, lang="en").items(100):
         tweet_id = tweet.id
         tweet_date = datetime.strptime(str(tweet.created_at)[:10], '%Y-%m-%d').strftime('%d-%m-%Y')
         tweet_text = tweet.text
@@ -181,7 +173,18 @@ def update_score_trend(city):
 
 def update_map(cities_data_frame):
     # Make an empty map
-    m = folium.Map(location=[20, 0], tiles="Mapbox Bright", zoom_start=2)
+    m = folium.Map(location=[20, 0], tiles="Mapbox Control Room", zoom_start=2)
+    folium.TileLayer('openstreetmap').add_to(m)
+    folium.TileLayer('Mapbox Bright').add_to(m)
+    folium.TileLayer('Stamen Terrain').add_to(m)
+    folium.TileLayer('stamenwatercolor').add_to(m)
+    folium.TileLayer('cartodbpositron').add_to(m)
+    folium.TileLayer('cartodbdark_matter').add_to(m)
+    # folium.TileLayer('Mapbox Control Room').add_to(m)
+    # folium.TileLayer('stamentoner').add_to(m)
+    # other mapping code (e.g. lines, markers etc.)
+    folium.LayerControl().add_to(m)
+
     for i in range(0, len(cities_data_frame)):
         circle_color = get_color(cities_data_frame.iloc[i]['score'])
         radius = get_radius(abs(cities_data_frame.iloc[i]['score']))
@@ -195,22 +198,11 @@ def update_map(cities_data_frame):
             fill_color=circle_color
         ).add_to(m)
 
-    # Save it as html
-    m.save('mymap_' + datetime.now().strftime("%Y-%m-%d-%H-%M") + '.html')
+    m.save('index.html')
     print(datetime.now().strftime("%Y-%m-%d-%H-%M") + ' *** Map generated ***')
 
 
 def get_color(score):
-    # if score < -0.1:
-    #     # red
-    #     color_val = color[0]
-    # elif score > 0.1:
-    #     # green
-    #     color_val = color[2]
-    # else:
-    #     # yellow
-    #     color_val = color[1]
-    # return color_val
     if score < -0.9:
         color_val = color[0]
     elif score < -0.8:
