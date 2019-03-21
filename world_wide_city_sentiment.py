@@ -173,7 +173,7 @@ def update_score_trend(city):
 
 def update_map(cities_data_frame):
     # Make an empty map
-    m = folium.Map(location=[20, 0], tiles="Mapbox Control Room", zoom_start=2)
+    m = folium.Map(location=[20, 0], tiles="Mapbox Control Room", zoom_start=3)
     folium.TileLayer('openstreetmap').add_to(m)
     folium.TileLayer('Mapbox Bright').add_to(m)
     folium.TileLayer('Stamen Terrain').add_to(m)
