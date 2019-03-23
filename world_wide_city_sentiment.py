@@ -6,17 +6,15 @@ from collections import OrderedDict
 from datetime import datetime
 
 import folium
-import matplotlib
-import matplotlib as mpl
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy
-import pandas as pd
 import tweepy
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from matplotlib.pyplot import figure, show
 from model.city import City
+from model.city_frame import City_frame
 from model.tweet import Tweet
 from resources.color_gradient import color
 from resources.credentials import *
@@ -67,8 +65,7 @@ def convert_list_to_data_frame(cities):
         lon.append(float((str(city.location).split(",")[0])))
         lat.append(float((str(city.location).split(",")[1])))
         score.append(city.score_trend)
-    zippedList = list(zip(names, lon, lat, score))
-    cities_data_frame = pd.DataFrame(zippedList, columns=['name', 'lon', 'lat', 'score'])
+    cities_data_frame = City_frame(names, lon, lat, score)
     return cities_data_frame
 
 
@@ -185,12 +182,12 @@ def update_map(cities_data_frame):
     # other mapping code (e.g. lines, markers etc.)
     folium.LayerControl().add_to(m)
 
-    for i in range(0, len(cities_data_frame)):
-        circle_color = get_color(cities_data_frame.iloc[i]['score'])
-        radius = get_radius(abs(cities_data_frame.iloc[i]['score']))
-        popup = str(cities_data_frame.iloc[i]['name']) + ' ' + str(cities_data_frame.iloc[i]['score'])
+    for i in range(0, len(cities_data_frame.names)):
+        circle_color = get_color(cities_data_frame.score[i])
+        radius = get_radius(abs(cities_data_frame.score[i]))
+        popup = str(cities_data_frame.names[i]) + ' ' + str(cities_data_frame.score[i])
         folium.CircleMarker(
-            location=[cities_data_frame.iloc[i]['lon'], cities_data_frame.iloc[i]['lat']],
+            location=[cities_data_frame.lon[i], cities_data_frame.lat[i]],
             popup=popup,
             radius=radius,
             color=circle_color,
